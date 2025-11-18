@@ -11,7 +11,7 @@ from typing       import Iterable
 
 from .types       import USBDirection
 from .magic       import instantiate_subordinates, AutoInstantiable
-from .request     import USBRequestHandler
+from .request     import ControlRequestHandler, USBRequestHandler
 
 from .interface   import USBInterface
 from .descriptor  import USBDescribable, USBDescriptor, StringRef
@@ -285,10 +285,10 @@ class USBConfiguration(USBDescribable, AutoInstantiable, USBRequestHandler):
     # Backend functions for our RequestHandler class.
     #
 
-    def _request_handlers(self) -> Iterable[callable]:
+    def _request_handlers(self) -> Iterable[ControlRequestHandler]:
         return ()
 
-    def _get_subordinate_handlers(self) -> Iterable[USBInterface]:
+    def _get_subordinate_handlers(self) -> Iterable[USBRequestHandler]:
         return self.interfaces.values()
 
 

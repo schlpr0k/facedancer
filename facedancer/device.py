@@ -12,7 +12,7 @@ import struct
 import warnings
 import itertools
 
-from typing         import Coroutine, Dict, Iterable, Union
+from typing         import Callable, Coroutine, Dict, Iterable, Union
 from dataclasses    import field
 
 from prompt_toolkit import HTML, print_formatted_text
@@ -29,7 +29,7 @@ from .descriptor    import USBDescribable, USBDescriptor, StringDescriptorManage
 from .configuration import USBConfiguration
 from .interface     import USBInterface
 from .endpoint      import USBEndpoint
-from .request       import USBControlRequest, USBRequestHandler
+from .request       import ControlRequestHandler, USBControlRequest, USBRequestHandler
 from .request       import standard_request_handler, to_device, get_request_handler_methods
 
 from .logging       import log
@@ -86,7 +86,7 @@ class USBBaseDevice(USBDescribable, USBRequestHandler):
     device_speed             : DeviceSpeed = None
 
     # Descriptors that can be requested with the GET_DESCRIPTOR request.
-    requestable_descriptors  : Dict[tuple[int, int], Union[bytes, callable]] = field(default_factory=dict)
+    requestable_descriptors  : Dict[tuple[int, int], Union[bytes, Callable[..., bytes]]] = field(default_factory=dict)
     configurations           : Dict[int, USBConfiguration]       = field(default_factory=dict)
     backend                  : FacedancerUSBApp = None
 
@@ -564,11 +564,11 @@ class USBBaseDevice(USBDescribable, USBRequestHandler):
     # Methods for USBRequestHandler.
     #
 
-    def _request_handlers(self) -> Iterable[callable]:
+    def _request_handlers(self) -> Iterable[ControlRequestHandler]:
         return self._request_handler_methods
 
 
-    def _get_subordinate_handlers(self) -> Iterable[callable]:
+    def _get_subordinate_handlers(self) -> Iterable[USBRequestHandler]:
         # As a device, our subordinates are our configurations.
         return self.configurations.values()
 

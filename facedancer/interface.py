@@ -9,7 +9,7 @@ from __future__  import annotations
 import struct
 import textwrap
 
-from typing       import Dict, List, Iterable
+from typing       import Dict, Iterable, List
 from dataclasses  import field
 from collections  import defaultdict
 
@@ -18,7 +18,8 @@ from .types       import USBDirection, USBStandardRequests
 
 from .            import device
 from .descriptor  import USBDescribable, USBDescriptor, USBClassDescriptor, USBDescriptorTypeNumber, StringRef
-from .request     import USBControlRequest, USBRequestHandler, get_request_handler_methods
+from .request     import (ControlRequestHandler, USBControlRequest, USBRequestHandler,
+                          get_request_handler_methods)
 from .request     import standard_request_handler, to_this_interface
 from .endpoint    import USBEndpoint
 
@@ -358,10 +359,10 @@ class USBInterface(USBDescribable, AutoInstantiable, USBRequestHandler):
     # Request handler functions.
     #
 
-    def _request_handlers(self) -> Iterable[callable]:
+    def _request_handlers(self) -> Iterable[ControlRequestHandler]:
         return self._request_handler_methods
 
-    def _get_subordinate_handlers(self) -> Iterable[callable]:
+    def _get_subordinate_handlers(self) -> Iterable[USBRequestHandler]:
         return self.endpoints.values()
 
 
