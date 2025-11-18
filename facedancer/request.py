@@ -3,11 +3,13 @@
 #
 """ Functionality for declaring and working with USB control requests. """
 
+from __future__ import annotations
+
 import inspect
 import warnings
 import functools
 
-from typing      import List, Iterable
+from typing      import Callable, Iterable, List
 from dataclasses import dataclass
 from abc         import ABCMeta, abstractmethod
 
@@ -183,7 +185,7 @@ def to_other(func):
 # Metaprogramming aides.
 #
 
-def get_request_handler_methods(cls) -> List[callable]:
+def get_request_handler_methods(cls) -> List[ControlRequestHandler]:
     """ Returns a list of all handler methods on a given class or object.
 
     This is used to find all methods of an object decorated with the
@@ -366,11 +368,11 @@ class USBRequestHandler(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def _request_handlers(self) -> Iterable[callable]:
+    def _request_handlers(self) -> Iterable[ControlRequestHandler]:
         """ Returns an iterable of request handlers provided by the class. """
 
 
-    def _get_subordinate_handlers(self) -> Iterable[callable]:
+    def _get_subordinate_handlers(self) -> Iterable[USBRequestHandler]:
         """ Returns an iterable of subordinate handlers who should have an opportunity to handle requests.
 
         Normally called by _call_subordinate_handlers; may not be valid if that function is overridden.
